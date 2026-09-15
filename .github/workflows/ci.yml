@@ -1,0 +1,22 @@
+name: Lambda CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - run: dotnet restore GarageManagement.AuthLambda.sln
+      - run: dotnet build GarageManagement.AuthLambda.sln --no-restore --configuration Release
+      - run: dotnet test GarageManagement.AuthLambda.sln --no-build --configuration Release
+      - run: docker build -t garage-management-auth-lambda:${{ github.sha }} .
