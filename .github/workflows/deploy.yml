@@ -1,6 +1,8 @@
 name: Lambda Deploy
 
 on:
+  push:
+    branches: [main, develop]
   workflow_dispatch:
     inputs:
       environment:
@@ -17,7 +19,7 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || (github.ref_name == 'main' && 'producao' || 'homologacao') }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
